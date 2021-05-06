@@ -97,6 +97,9 @@ Pi2: IMGFILE := kernel7.img
 Pi1: CFLAGS += -ffreestanding -nostartfiles -std=c11 -mcpu=arm1176jzf-s
 Pi1: IMGFILE := kernel.img
 
+Pi0: CFLAGS += -ffreestanding -nostartfiles -std=c11 -mcpu=arm1176jzf-s
+Pi0: IMGFILE := kernel.img
+
 # Set linker flags common to all platforms.  platformVars can add additional
 # flags if needed.  Do not use the "-Wl," prefix either here on in platformVars.
 LDFLAGS := -Wl,-T $(LINKER_FILE) -Wl,--gc-sections -Wl,--build-id=none
@@ -173,6 +176,9 @@ Pi2: freertos.elf
 
 Pi1: freertos.elf
 .PHONY: Pi1
+
+Pi0: freertos.elf
+.PHONY: Pi0
 
 freertos.elf : $(SOFILES) $(COFILES)
 	$(ARMGNU)-gcc $(CFLAGS) -o $@ $(LDFLAGS) $^ $(LDLIBS)

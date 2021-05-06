@@ -304,7 +304,7 @@ typedef union
 	struct __attribute__((__packed__))
 	{
 		unsigned DATA_LENGTH : 1;									// @0	 If clear the UART works in 7-bit mode, If set the UART works in 8-bit mode 
-		unsigned reserved : 5;										// @1-5	 Reserved, write zero, read as don’t care Some of these bits have functions in a 16550 compatible UART but are ignored here
+		unsigned reserved : 5;										// @1-5	 Reserved, write zero, read as donï¿½t care Some of these bits have functions in a 16550 compatible UART but are ignored here
 		unsigned BREAK : 1;											// @6	 If set high the UART1_TX line is pulled low continuously
 		unsigned DLAB : 1;											// @7	 DLAB access control bit.
 		unsigned reserved1 : 24;									// @8-31 Reserved - Write as 0, read as don't care 
@@ -319,7 +319,7 @@ typedef union
 {
 	struct __attribute__((__packed__))
 	{
-		unsigned reserved : 1;										// @0	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 1;										// @0	 Reserved, write zero, read as donï¿½t care 
 		unsigned RTS : 1;											// @1	 If clear the UART1_RTS line is high, If set the UART1_RTS line is low 
 		unsigned reserved1 : 30;									// @2-31 Reserved - Write as 0, read as don't care 
 	};
@@ -335,7 +335,7 @@ typedef union
 	{
 		unsigned RXFDA : 1;											// @0	 This bit is set if the receive FIFO holds at least 1 
 		unsigned RXOE : 1;											// @1	 This bit is set if there was a receiver overrun
-		unsigned reserved : 3;										// @2-4	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 3;										// @2-4	 Reserved, write zero, read as donï¿½t care 
 		unsigned TXFE : 1;											// @5	 This bit is set if the transmit FIFO can accept at least one byte
 		unsigned TXIdle : 1;										// @6	 This bit is set if the transmit FIFO is empty and the transmitter is idle. (Finished shifting out the last bit). 
 		unsigned reserved1 : 25;									// @7-31 Reserved - Write as 0, read as don't care 
@@ -350,7 +350,7 @@ typedef union
 {
 	struct __attribute__((__packed__))
 	{
-		unsigned reserved : 4;										// @0-3	 Reserved, write zero, read as don’t care 
+		unsigned reserved : 4;										// @0-3	 Reserved, write zero, read as donï¿½t care 
 		unsigned CTS : 1;											// @4	 This bit is the inverse of the CTS input, If set the UART1_CTS pin is low If clear the UART1_CTS pin is high 
 		unsigned reserved1 : 27;									// @5-31 Reserved - Write as 0, read as don't care 
 	};
@@ -1566,7 +1566,7 @@ bool TimerIrqSetup (uint32_t period_in_us)							// Period between timer interru
 . Largest period is around 16 million usec (16 sec) it varies on core speed
 . RETURN: The old function pointer that was in use (will return 0 for 1st).
 .--------------------------------------------------------------------------*/
-uintptr_t TimerFiqSetup (uint32_t period_in_us, 					// Period between timer interrupts in usec
+uintptr_t TimerFiqSetup (uint32_t period_in_250ns, 					// Period between timer interrupts in usec
 						 void(*ARMaddress)(void))					// Function to call (0 = ignored)
 {
 	uint32_t Buffer[5] = { 0 };
@@ -1577,8 +1577,8 @@ uintptr_t TimerFiqSetup (uint32_t period_in_us, 					// Period between timer int
 	{
 		Buffer[4] /= 250;											// The prescaler divider is set to 250 (based on GPU=250MHz to give 1Mhz clock)
 		Buffer[4] /= 10000;											// Divid by 10000 we are trying to hold some precision should be in low hundreds (160'ish)
-		Buffer[4] *= period_in_us;									// Multiply by the micro seconds result
-		Buffer[4] /= 100;											// This completes the division by 1000000 (done as /10000 and /100)
+		Buffer[4] *= period_in_250ns;									// Multiply by the micro seconds result
+		Buffer[4] /= 100/4;											// This completes the division by 1000000 (done as /10000 and /100)
 		if (Buffer[4] != 0) {										// Invalid divisor of zero will return with fail
 			if (ARMaddress) oldHandler = setFiqFuncAddress(ARMaddress);// Change the handler
 			ARMTIMER->Load = Buffer[4];								// Set the load value to divisor
